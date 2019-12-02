@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative "error"
+require "awesome_print"
+require "byebug"
 
 module SassC
   class Engine
@@ -39,6 +41,9 @@ module SassC
       import_handler.setup(native_options)
       functions_handler.setup(native_options)
 
+      ap "------------------ Data Context ------------------"
+      ap data_context
+      ap "--------------------------------------------------"
       status = Native.compile_data_context(data_context)
 
       if status != 0
