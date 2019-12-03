@@ -42,7 +42,9 @@ module SassC
       functions_handler.setup(native_options)
 
       ap "------------------ Data Context ------------------"
-      ap data_context
+      ap "Data context: #{data_context}\n"
+      ap "Template:\n#{template}\n"
+      ap "Options:\n#{options}\n"
       ap "--------------------------------------------------"
       status = Native.compile_data_context(data_context)
 
