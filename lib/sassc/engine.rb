@@ -43,8 +43,10 @@ module SassC
 
       ap "------------------ Data Context ------------------"
       ap "Data context: #{data_context}\n"
-      ap "Template:\n#{template}\n"
-      ap "Options:\n#{options}\n"
+      # ap "Template:\n#{template}\n"
+      ap "File: #{filename}"
+      ap "Options:\n"
+      ap options
       ap "--------------------------------------------------"
       status = Native.compile_data_context(data_context)
 
