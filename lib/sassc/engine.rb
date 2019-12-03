@@ -41,16 +41,20 @@ module SassC
       import_handler.setup(native_options)
       functions_handler.setup(native_options)
 
-      ap "------------------ Data Context ------------------"
-      ap "Data context: #{data_context}\n"
-      # ap "Template:\n#{template}\n"
-      ap "Context:\n"
-      ap context
-      ap "File: #{filename}"
-      ap "Options:\n"
-      ap options
-      ap native_options
-      ap "\n--------------------------------------------------"
+      if !(ENV["SASSC_NINJA_MODE"].blank?)
+        ap "------------------ Debug Ninja Mode ------------------"
+        ap "Data context: #{data_context}\n"
+        # ap "Template:\n#{template}\n"
+        ap "Context:\n"
+        ap context
+        ap "File: #{filename}"
+        ap "Options:\n"
+        ap options
+        ap "Native Options:\n"
+        ap native_options
+        ap "\n-----------------------------------------------------"
+      end 
+
       status = Native.compile_data_context(data_context)
 
       if status != 0
