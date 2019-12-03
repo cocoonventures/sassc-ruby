@@ -43,16 +43,22 @@ module SassC
 
       if !(ENV["SASSC_NINJA_MODE"].blank?)
         ap "------------------ Debug Ninja Mode ------------------"
-        ap "Data context: #{data_context}\n"
-        # ap "Template:\n#{template}\n"
-        ap "Context:\n"
+        ap "Data context:"
+        ap data_context
+
+        if !(ENV["SASSC_NINJA_VOMIT"].blank?)
+          ap "Template:"
+          ap template 
+        end
+
+        ap "Context:"
         ap context
         ap "File: #{filename}"
-        ap "Options:\n"
+        ap "Options:"
         ap options
-        ap "Native Options:\n"
+        ap "Native Options:"
         ap native_options
-        ap "\n-----------------------------------------------------"
+        ap "-----------------------------------------------------"
       end 
 
       status = Native.compile_data_context(data_context)
