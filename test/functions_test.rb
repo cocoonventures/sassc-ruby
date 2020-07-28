@@ -140,7 +140,7 @@ module SassC
 
       assert_match /Error: error in C function function_that_raises_errors/, exception.message
       assert_match /Intentional wrong thing happened somewhere inside the custom function/, exception.message
-      assert_equal "[SassC::FunctionsHandler] Intentional wrong thing happened somewhere inside the custom function", stderr_output
+      assert_match /\[SassC::FunctionsHandler\] Intentional wrong thing happened somewhere inside the custom function/, stderr_output
     end
 
     def test_function_that_returns_a_sass_value
@@ -198,6 +198,17 @@ module SassC
           end
         end
         threads.each(&:join)
+      end
+    end
+
+    def test_pass_custom_functions_as_a_parameter
+      out = Engine.new("div { url: test-function(); }", {functions: ExternalFunctions}).render
+      assert_match /custom_function/, out
+    end
+
+    def test_pass_incompatible_type_to_custom_functions
+      assert_raises(TypeError) do
+        Engine.new("div { url: test-function(); }", {functions: Class.new}).render
       end
     end
 
@@ -317,6 +328,12 @@ module SassC
         SassC::Script::Value::List.new(numbers, separator: :space)
       end
 
+    end
+
+    module ExternalFunctions
+      def test_function
+        SassC::Script::Value::String.new("custom_function", :string)
+      end
     end
 
   end

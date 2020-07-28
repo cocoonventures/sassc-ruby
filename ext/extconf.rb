@@ -19,13 +19,17 @@ if enable_config('static-stdlib', false)
   $LDFLAGS << ' -static-libgcc -static-libstdc++'
 end
 
-# Set to false when building binary gems
-if enable_config('march-tune-native', true)
+if enable_config('march-tune-native', false)
   $CFLAGS << ' -march=native -mtune=native'
   $CXXFLAGS << ' -march=native -mtune=native'
 end
 
-if enable_config('lto', true)
+# darwin nix clang doesn't support lto
+# disable -lto flag for darwin + nix
+# see: https://github.com/sass/sassc-ruby/issues/148
+enable_lto_by_default = (Gem::Platform.local.os == "darwin" && ENV['NIX_CC'].nil?)
+
+if enable_config('lto', enable_lto_by_default)
   $CFLAGS << ' -flto'
   $CXXFLAGS << ' -flto'
   $LDFLAGS << ' -flto'
@@ -56,7 +60,13 @@ $INCFLAGS << " -I$(srcdir)/libsass/include"
 $VPATH << "$(srcdir)/libsass/src"
 Dir.chdir(__dir__) do
   $VPATH += Dir['libsass/src/*/'].map { |p| "$(srcdir)/#{p}" }
-  $srcs = Dir['libsass/src/**/*.{c,cpp}']
+  $srcs = Dir['libsass/src/**/*.{c,cpp}'].sort
+end
+
+# libsass.bundle malformed object (unknown load command 7) on Mac OS X
+# See https://github.com/sass/sassc-ruby/pull/174
+if enable_config('strip', RbConfig::CONFIG['host_os'].downcase !~ /darwin/)
+  MakeMakefile::LINK_SO << "\nstrip -x $@"
 end
 
 # Don't link libruby.

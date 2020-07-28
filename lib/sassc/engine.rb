@@ -16,6 +16,7 @@ module SassC
     def initialize(template, options = {})
       @template = template
       @options = options
+      @functions = options.fetch(:functions, Script::Functions)
     end
 
     def render
@@ -37,7 +38,7 @@ module SassC
       Native.option_set_omit_source_map_url(native_options, true) if omit_source_map_url?
 
       import_handler.setup(native_options)
-      functions_handler.setup(native_options)
+      functions_handler.setup(native_options, functions: @functions)
 
       status = Native.compile_data_context(data_context)
 
@@ -54,11 +55,12 @@ module SassC
       @dependencies = Native.context_get_included_files(context)
       @source_map   = Native.context_get_source_map_string(context)
 
-      Native.delete_data_context(data_context)
-
       css.force_encoding(@template.encoding)
+      @source_map.force_encoding(@template.encoding) if @source_map.is_a?(String)
 
       return css unless quiet?
+    ensure
+      Native.delete_data_context(data_context) if data_context
     end
 
     def dependencies
